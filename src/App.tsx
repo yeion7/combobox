@@ -1,24 +1,28 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 const App: React.FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="Combobox-container">
+      <div className="Combobox-container">
+        <div className="Combobox">
+          <div className="Combobox-label">Selecciona algo:</div>
+          <div className="relative">
+            <input type="text" className="Combobox-input" />
+            <div className="Combobox-button">
+              <svg viewBox="0 0 20 20" preserveAspectRatio="none" width="16" fill="transparent"
+                stroke="#979797" stroke-width="1.1px">
+                <path d="M1,6 L10,15 L19,6"></path>
+              </svg>
+            </div>
+          </div>
+          <div className="relative">
+            <div className='Combobox-menu'>
+              <div className="Combobox-item">Option 1</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
