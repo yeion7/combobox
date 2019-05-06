@@ -2,13 +2,9 @@
   box-sizing: border-box
 }
 
-.Combobox-container {
-  margin: 1em;
-}
-
 .Combobox {
   width: 250px;
-  margin: auto;
+  margin: 1em auto;
 }
 
 .Combobox-input {

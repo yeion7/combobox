@@ -1,29 +1,51 @@
 import React from 'react';
 import './App.css';
+import ArrowIcon from './Components/ArrowIcon';
+
+const ComboBox: React.FC = ({ children }) => (
+  <div className='Combobox'>
+    {children}
+  </div>
+)
+
+const ComboBoxLabel: React.FC = ({ children }) => (
+  <div className='Combobox-label'>
+    {children}
+  </div>
+)
+
+const ComboBoxInput: React.FC = () => (
+  <div className="relative">
+    <input type='text' className='Combobox-input'/>
+    <div className='Combobox-button'>
+      <ArrowIcon />
+    </div>
+  </div>
+)
+
+const ComboBoxMenu: React.FC<{isOpen?: boolean}> = ({ children, isOpen = false }) => {
+  return (
+    <div className="relative">
+      <div className='Combobox-menu Combobox-menu__open'>
+        {isOpen ? children : null}
+      </div>
+    </div>
+  )
+}
+
+const ComboBoxItem: React.FC = ({ children }) => (
+  <div className='Combobox-item Combobox-item__selected'>{children}</div>
+)
 
 const App: React.FC = () => {
   return (
-    <div className="Combobox-container">
-      <div className="Combobox-container">
-        <div className="Combobox">
-          <div className="Combobox-label">Selecciona algo:</div>
-          <div className="relative">
-            <input type="text" className="Combobox-input" />
-            <div className="Combobox-button">
-              <svg viewBox="0 0 20 20" preserveAspectRatio="none" width="16" fill="transparent"
-                stroke="#979797" stroke-width="1.1px">
-                <path d="M1,6 L10,15 L19,6"></path>
-              </svg>
-            </div>
-          </div>
-          <div className="relative">
-            <div className='Combobox-menu'>
-              <div className="Combobox-item">Option 1</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <ComboBox>
+      <ComboBoxLabel>Selecciona algo:</ComboBoxLabel>
+      <ComboBoxInput />
+      <ComboBoxMenu>
+        <ComboBoxItem>Option</ComboBoxItem>
+      </ComboBoxMenu>
+    </ComboBox>
   );
 }
 
