@@ -25,18 +25,14 @@
   transition: box-shadow .1s ease,width .1s ease;
 }
 
-.Combobox-input:hover, .Combobox-input:focus {
+/* .Combobox-input__open, .Combobox-input:hover, .Combobox-input:focus {
   border-color: #96c8da;
   box-shadow: 0 2px 3px 0 rgba(34,36,38,.15);
-}
+} */
 
 .Combobox-input__open {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
-}
-
-.Combobox-input__open:hover, .Combobox-input__open:focus {
-  box-shadow: none
 }
 
 .Combobox-label {
@@ -67,24 +63,23 @@
   background-color: white;
   width: 100%;
   max-height: 20rem;
-  overflow: auto;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   outline: 0;
   transition: opacity .1s ease;
-  border-radius: 0 0 .28571429rem .28571429rem;
   box-shadow: 0 2px 3px 0 rgba(34,36,38,.15);
-  border-color: #96c8da;
-  border-top-width: 0;
-  border-right-width: 1;
-  border-bottom-width: 1;
-  border-left-width: 1;
-  border-style: solid;
+  border-radius: 0 0 .28571429rem .28571429rem;
   border: none;
 }
 
-.Combobox-menu__open {
-  border: initial;
-}
+/* .Combobox-menu__open {
+  border-color: #96c8da;
+  border-top-width: 0px;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+  border-left-width: 1px;
+  border-style: solid;
+} */
 
 .Combobox-item {
   position: relative;
