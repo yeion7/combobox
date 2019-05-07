@@ -3,20 +3,22 @@ import ArrowIcon from './Components/ArrowIcon';
 import XIcon from './Components/XIcon';
 import { House } from './App';
 
-export const ComboBox: React.FC = ({ children }) => (
-  <div className='Combobox'>
+type DivElement = React.FC<React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>>
+export const ComboBox: DivElement = ({ children, ...restProps }) => (
+  <div className='Combobox' {...restProps}>
     {children}
   </div>
 );
 
-export const ComboBoxLabel: React.FC<LabelHTMLAttributes<HTMLLabelElement>> = ({ children, ...restProps }) => (
-  <label 
-    className='Combobox-label' 
-    {...restProps}
-  >
-    {children}
-  </label>
-);
+export const ComboBoxLabel: React.FC<LabelHTMLAttributes<HTMLLabelElement>> =
+  ({ children, ...restProps }) => (
+    <label
+      {...restProps}
+      className='Combobox-label'
+    >
+      {children}
+    </label>
+  );
 
 interface Input {
   value: string;
@@ -35,17 +37,24 @@ export const ComboBoxInput: React.FC<Input> = ({
   isOpen,
   selectedItem,
   clear,
-  id
+  id,
+  ...restProps
 }) => (
     <div className="relative">
       <input
+        {...restProps}
         id={id}
         type='text'
         className={`Combobox-input ${isOpen ? "Combobox-input__open" : ''}`}
         value={value}
         onChange={onChange}
       />
-      <button className='Combobox-button' onClick={(selectedItem && !isOpen) ? clear : toggleMenu}>
+      <button
+        className='Combobox-button'
+        onClick={(selectedItem && !isOpen) ? clear : toggleMenu}
+        aria-label={isOpen ? 'Cerrar Menu' : 'Abrir Menu'}
+        aria-haspopup="true"
+      >
         {(isOpen || selectedItem) ? <XIcon /> : <ArrowIcon />}
       </button>
     </div>
@@ -55,10 +64,15 @@ interface Menu {
   isOpen?: boolean;
   id: string
 }
-export const ComboBoxMenu: React.FC<Menu> = ({ children, isOpen = false, id }) => {
+type ULElement = React.DetailedHTMLProps<React.HTMLAttributes<HTMLUListElement>, HTMLUListElement>
+export const ComboBoxMenu: React.FC<Menu & ULElement> = ({ children, isOpen = false, id, ...restProps }) => {
   return (
     <div className="relative">
-      <ul className={`Combobox-menu ${isOpen ? 'Combobox-menu__open' : ''}`} id={id}>
+      <ul
+        {...restProps}
+        className={`Combobox-menu ${isOpen ? 'Combobox-menu__open' : ''}`}
+        id={id}
+      >
         {isOpen ? children : null}
       </ul>
     </div>
@@ -70,11 +84,15 @@ interface Item {
   isSelected: boolean;
   id: string
 }
-export const ComboBoxItem: React.FC<Item> = ({ children, onClick, isSelected, id }) => (
-  <li
-    id={id}
-    className={`Combobox-item ${isSelected ? 'Combobox-item__selected' : ''}`}
-    onClick={onClick}>
-    {children}
-  </li>
-);
+type LIElement = React.DetailedHTMLProps<React.LiHTMLAttributes<HTMLLIElement>, HTMLLIElement>
+export const ComboBoxItem: React.FC<Item & LIElement> =
+  ({ children, onClick, isSelected, id, ...restProps }) => (
+    <li
+      {...restProps}
+      id={id}
+      className={`Combobox-item ${isSelected ? 'Combobox-item__selected' : ''}`}
+      onClick={onClick}
+    >
+      {children}
+    </li>
+  );
