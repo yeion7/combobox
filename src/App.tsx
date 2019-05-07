@@ -1,5 +1,7 @@
 import React, { useReducer } from 'react';
+import matchSorter from 'match-sorter'
 import './App.css';
+
 import {
   ComboBox,
   ComboBoxLabel,
@@ -8,14 +10,19 @@ import {
   ComboBoxItem
 } from './ComboBox';
 
+
+import DATA from './data.json'
+
+export type House = typeof DATA[0];
+
 interface ComboBoxState {
   isOpen: boolean,
   inputValue: string,
-  selectedItem: number | null
+  selectedItem: House | null
 }
 
 type Action = { type: "INPUT", payload: string }
-  | { type: "SELECT", payload: { id: number, label: string } }
+  | { type: "SELECT", payload: House }
   | { type: "TOGGLE_MENU" }
   | { type: "CLEAR" }
 
@@ -39,8 +46,8 @@ const comboBoxReducer = (
     case 'SELECT':
       return {
         ...state,
-        inputValue: action.payload.label,
-        selectedItem: action.payload.id,
+        inputValue: action.payload.name,
+        selectedItem: action.payload,
         isOpen: false
       }
     case 'TOGGLE_MENU':
@@ -55,41 +62,58 @@ const comboBoxReducer = (
   }
 }
 
-const options = [{ id: 1, label: 'Mango' }, { id: 2, label: 'Manzana' }]
+const options = DATA
 
 const App: React.FC = () => {
   const [state, dispatch] = useReducer(comboBoxReducer, initialState)
 
   return (
-    <ComboBox>
-      <ComboBoxLabel>Selecciona algo:</ComboBoxLabel>
-      <ComboBoxInput
-        value={state.inputValue}
-        onChange={(e) => dispatch({ type: 'INPUT', payload: e.target.value })}
-        toggleMenu={(e) => {
-          e.preventDefault()
-          dispatch({ type: "TOGGLE_MENU" })
-        }}
-        isOpen={state.isOpen}
-        selectedItem={state.selectedItem}
-        clear={() => dispatch({ type: 'CLEAR' })}
-      />
-      <ComboBoxMenu isOpen={state.isOpen}>
-        {
-          options
-            .filter(({ label }) => label.includes(state.inputValue))
-            .map(({ id, label }) => (
-              <ComboBoxItem
-                key={id}
-                onClick={() => dispatch({ type: 'SELECT', payload: { id, label } })}
-                isSelected={state.selectedItem === id}
-              >
-                {label}
-              </ComboBoxItem>
-            ))
-        }
-      </ComboBoxMenu>
-    </ComboBox>
+    <section>
+      <ComboBox>
+        <ComboBoxLabel>Selecciona una casa:</ComboBoxLabel>
+        <ComboBoxInput
+          value={state.inputValue}
+          onChange={(e) => dispatch({ type: 'INPUT', payload: e.target.value })}
+          toggleMenu={(e) => {
+            e.preventDefault()
+            dispatch({ type: "TOGGLE_MENU" })
+          }}
+          isOpen={state.isOpen}
+          selectedItem={state.selectedItem}
+          clear={() => dispatch({ type: 'CLEAR' })}
+        />
+        <ComboBoxMenu isOpen={state.isOpen}>
+          {
+              matchSorter(options, state.inputValue, {
+                keys: ['name', 'words'],
+              })
+              .map((house) => (
+                <ComboBoxItem
+                  key={house.id}
+                  onClick={() => dispatch({ type: 'SELECT', payload: house })}
+                  isSelected={state.selectedItem ? state.selectedItem.id === house.id : false}
+                >
+                  {house.name}
+                </ComboBoxItem>
+              ))
+          }
+        </ComboBoxMenu>
+      </ComboBox>
+      {
+        state.selectedItem && (
+          <div style={{ textAlign: 'center' }}>
+            <h3>{state.selectedItem.name}</h3>
+            <figure>
+              <img 
+                src={state.selectedItem.image || ''} 
+                alt={state.selectedItem.coatOfArms || ''} 
+              />
+              <figcaption>{state.selectedItem.words}</figcaption>
+            </figure>
+          </div>
+        )
+      }
+    </section>
   );
 }
 

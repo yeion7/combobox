@@ -1,6 +1,7 @@
 import React from 'react';
 import ArrowIcon from './Components/ArrowIcon';
 import XIcon from './Components/XIcon';
+import { House } from './App';
 
 export const ComboBox: React.FC = ({ children }) => (
   <div className='Combobox'>
@@ -19,7 +20,7 @@ interface Input {
   onChange: React.ChangeEventHandler<HTMLInputElement>;
   toggleMenu: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   clear: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
-  selectedItem: number | null;
+  selectedItem: House | null;
   isOpen: boolean;
 }
 
