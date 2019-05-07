@@ -12,6 +12,7 @@ import {
 
 
 import DATA from './data.json'
+import { generateId } from './utils';
 
 export type House = typeof DATA[0];
 
@@ -66,12 +67,23 @@ const options = DATA
 
 const App: React.FC = () => {
   const [state, dispatch] = useReducer(comboBoxReducer, initialState)
-
+  const id = `${generateId()}`
+  const menuId = `${id}-menu`
+  const labelId = `${id}-label`
+  const inputId = `${id}-input`
+  const getItemId = ((index: number) => `${id}-item-${index}`)
+  
   return (
     <section>
       <ComboBox>
-        <ComboBoxLabel>Selecciona una casa:</ComboBoxLabel>
+        <ComboBoxLabel 
+          id={labelId}
+          htmlFor={inputId}
+        >
+          Selecciona una casa:
+        </ComboBoxLabel>
         <ComboBoxInput
+          id={inputId}
           value={state.inputValue}
           onChange={(e) => dispatch({ type: 'INPUT', payload: e.target.value })}
           toggleMenu={(e) => {
@@ -82,13 +94,16 @@ const App: React.FC = () => {
           selectedItem={state.selectedItem}
           clear={() => dispatch({ type: 'CLEAR' })}
         />
-        <ComboBoxMenu isOpen={state.isOpen}>
+        <ComboBoxMenu 
+        id={menuId}
+        isOpen={state.isOpen}>
           {
               matchSorter(options, state.inputValue, {
                 keys: ['name', 'words'],
               })
-              .map((house) => (
+              .map((house, index) => (
                 <ComboBoxItem
+                  id={getItemId(index)}
                   key={house.id}
                   onClick={() => dispatch({ type: 'SELECT', payload: house })}
                   isSelected={state.selectedItem ? state.selectedItem.id === house.id : false}
