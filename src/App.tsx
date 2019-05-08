@@ -12,7 +12,7 @@ import {
 
 
 import DATA from './data.json'
-import { generateId } from './utils';
+import { generateId, normalizeArrowKey } from './utils';
 
 export type House = typeof DATA[0];
 
@@ -26,6 +26,8 @@ interface ComboBoxState {
 type Action = { type: "INPUT", payload: string }
   | { type: "SELECT", payload: House }
   | { type: "TOGGLE_MENU" }
+  | { type: "OPEN_MENU" }
+  | { type: "CLOSE_MENU" }
   | { type: "CLEAR" }
   | { type: "HIGHLIGH", payload: number }
 
@@ -45,13 +47,23 @@ const comboBoxReducer = (
       return {
         ...state,
         inputValue: action.payload,
-        isOpen: state.selectedItem ? !action.payload : !!action.payload
+        isOpen: !!action.payload
       }
     case 'SELECT':
       return {
         ...state,
         inputValue: action.payload.name,
         selectedItem: action.payload,
+        isOpen: false
+      }
+    case 'OPEN_MENU':
+      return {
+        ...state,
+        isOpen: true
+      }
+    case 'CLOSE_MENU':
+      return {
+        ...state,
         isOpen: false
       }
     case 'TOGGLE_MENU':
@@ -75,6 +87,10 @@ const options = DATA
 
 const App: React.FC = () => {
   const [state, dispatch] = useReducer(comboBoxReducer, initialState)
+  const optionsSorted = matchSorter(options, state.inputValue, {
+    keys: ['name', 'words'],
+  })
+
   const id = useMemo(() => `${generateId()}`, [])
   const menuId = `${id}-menu`
   const labelId = `${id}-label`
@@ -100,7 +116,46 @@ const App: React.FC = () => {
         <ComboBoxInput
           id={inputId}
           value={state.inputValue}
-          onChange={(e) => dispatch({ type: 'INPUT', payload: e.target.value })}
+          onChange={(e) => {
+            e.preventDefault()
+            dispatch({ type: 'INPUT', payload: e.target.value })
+          }}
+          onKeyDown={(e) => {
+            const key = normalizeArrowKey(e)
+
+            if (key === 'Enter' && state.highlightedIndex !== null) {
+              e.preventDefault()
+              dispatch({ 
+                type: 'SELECT',
+                payload: optionsSorted[state.highlightedIndex]
+              })
+            }
+
+            if (key === 'ArrowDown') {
+              e.preventDefault()
+              dispatch({ type: "OPEN_MENU" })
+              dispatch({
+                type: 'HIGHLIGH',
+                payload: state.highlightedIndex !== null
+                  ? (state.highlightedIndex + 1) % optionsSorted.length
+                  : 0
+              })
+            }
+
+            if (key === 'ArrowUp') {
+              e.preventDefault()
+              dispatch({ type: "OPEN_MENU" })
+              dispatch({
+                type: 'HIGHLIGH',
+                payload: state.highlightedIndex !== null
+                  ? (state.highlightedIndex - 1 + optionsSorted.length) % optionsSorted.length
+                  : optionsSorted.length - 1
+              })
+            }
+          }}
+          onKeyUp={(e) => {
+            e.preventDefault()
+          }}
           toggleMenu={(e) => {
             e.preventDefault()
             dispatch({ type: "TOGGLE_MENU" })
@@ -111,7 +166,11 @@ const App: React.FC = () => {
           aria-autocomplete="list"
           aria-controls={menuId}
           aria-multiline="false"
-          aria-activedescendant={state.highlightedIndex ? getItemId(state.highlightedIndex) : null}
+          aria-activedescendant={
+            state.highlightedIndex
+              ? getItemId(state.highlightedIndex)
+              : undefined
+          }
         />
         <ComboBoxMenu
           id={menuId}
@@ -120,9 +179,7 @@ const App: React.FC = () => {
           aria-labelledby={labelId}
         >
           {
-            matchSorter(options, state.inputValue, {
-              keys: ['name', 'words'],
-            })
+            optionsSorted
               .map((house, index) => (
                 <ComboBoxItem
                   role="option"
@@ -130,6 +187,11 @@ const App: React.FC = () => {
                     state.selectedItem
                       ? state.selectedItem.id === house.id
                       : state.highlightedIndex === index
+                  }
+                  className={
+                    state.highlightedIndex === index
+                      ? 'Combobox-item__highlighted'
+                      : ''
                   }
                   isSelected={
                     state.selectedItem

@@ -105,7 +105,7 @@
   font-weight: 700;
 }
 
-.Combobox-item__active, .Combobox-item:hover {
+.Combobox-item__highlighted {
   color: rgba(0,0,0,.95);
   background: rgba(0,0,0,.03);
 }

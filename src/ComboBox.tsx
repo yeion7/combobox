@@ -30,7 +30,9 @@ interface Input {
   id: string
 }
 
-export const ComboBoxInput: React.FC<Input> = ({
+type InputElement = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>
+
+export const ComboBoxInput: React.FC<Input & InputElement> = ({
   value,
   onChange,
   toggleMenu,
@@ -38,6 +40,7 @@ export const ComboBoxInput: React.FC<Input> = ({
   selectedItem,
   clear,
   id,
+  onKeyDown,
   ...restProps
 }) => (
     <div className="relative">
@@ -48,6 +51,7 @@ export const ComboBoxInput: React.FC<Input> = ({
         className={`Combobox-input ${isOpen ? "Combobox-input__open" : ''}`}
         value={value}
         onChange={onChange}
+        onKeyDown={onKeyDown}
       />
       <button
         className='Combobox-button'
@@ -86,11 +90,11 @@ interface Item {
 }
 type LIElement = React.DetailedHTMLProps<React.LiHTMLAttributes<HTMLLIElement>, HTMLLIElement>
 export const ComboBoxItem: React.FC<Item & LIElement> =
-  ({ children, onClick, isSelected, id, ...restProps }) => (
+  ({ children, onClick, isSelected, id, className = '', ...restProps }) => (
     <li
       {...restProps}
       id={id}
-      className={`Combobox-item ${isSelected ? 'Combobox-item__selected' : ''}`}
+      className={`Combobox-item ${className} ${isSelected ? 'Combobox-item__selected' : ''}`}
       onClick={onClick}
     >
       {children}
