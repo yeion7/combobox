@@ -1,3 +1,4 @@
+import computeScrollIntoView from 'compute-scroll-into-view'
 let idCounter = 0
 
 /**
@@ -15,4 +16,23 @@ export function normalizeArrowKey(event: any): string {
     return `Arrow${key}`
   }
   return key
+}
+
+/**
+ * Scroll node into view if necessary
+ */
+export  function scrollIntoView(node: HTMLElement | null, menuNode: HTMLElement | null ) {
+  if (node === null || menuNode === null) {
+    return
+  }
+
+  const actions = computeScrollIntoView(node, {
+    boundary: menuNode,
+    block: 'nearest',
+    scrollMode: 'if-needed',
+  })
+  actions.forEach(({el, top, left}) => {
+    el.scrollTop = top
+    el.scrollLeft = left
+  })
 }

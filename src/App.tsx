@@ -12,7 +12,7 @@ import {
 
 
 import DATA from './data.json'
-import { generateId, normalizeArrowKey } from './utils';
+import { generateId, normalizeArrowKey, scrollIntoView } from './utils';
 import XIcon from './Components/XIcon';
 import ArrowIcon from './Components/ArrowIcon';
 
@@ -90,6 +90,7 @@ const options = DATA
 const App: React.FC = () => {
   const [state, dispatch] = useReducer(comboBoxReducer, initialState)
   const inputRef = useRef<HTMLInputElement>(null)
+  const menuRef = useRef<HTMLUListElement>(null)
   const optionsSorted = matchSorter(options, state.inputValue, {
     keys: ['name', 'words'],
   })
@@ -103,6 +104,10 @@ const App: React.FC = () => {
     if (inputRef.current) {
       inputRef.current.focus()
     }
+  }
+
+  const getItemNodeFromIndex= (index: number) => {
+    return document.getElementById(getItemId(index))
   }
 
   const clear = () => {
@@ -156,23 +161,33 @@ const App: React.FC = () => {
             if (key === 'ArrowDown') {
               e.preventDefault()
               dispatch({ type: "OPEN_MENU" })
+
+              const newIndex = state.highlightedIndex !== null
+              ? (state.highlightedIndex + 1) % optionsSorted.length
+              : 0
+
               dispatch({
                 type: 'HIGHLIGH',
-                payload: state.highlightedIndex !== null
-                  ? (state.highlightedIndex + 1) % optionsSorted.length
-                  : 0
+                payload: newIndex
               })
+
+              scrollIntoView(getItemNodeFromIndex(newIndex), menuRef.current)
             }
 
             if (key === 'ArrowUp') {
               e.preventDefault()
               dispatch({ type: "OPEN_MENU" })
+              
+              const newIndex = state.highlightedIndex !== null
+              ? (state.highlightedIndex - 1 + optionsSorted.length) % optionsSorted.length
+              : optionsSorted.length - 1
+
               dispatch({
                 type: 'HIGHLIGH',
-                payload: state.highlightedIndex !== null
-                  ? (state.highlightedIndex - 1 + optionsSorted.length) % optionsSorted.length
-                  : optionsSorted.length - 1
+                payload: newIndex
               })
+
+              scrollIntoView(getItemNodeFromIndex(newIndex), menuRef.current)
             }
 
             if (key === 'Escape') {
@@ -241,6 +256,7 @@ const App: React.FC = () => {
           isOpen={isOpen}
           role="listbox"
           aria-labelledby={labelId}
+          ref={menuRef}
         >
           {
             optionsSorted

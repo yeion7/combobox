@@ -56,19 +56,21 @@ interface Menu {
   id: string
 }
 type ULElement = React.DetailedHTMLProps<React.HTMLAttributes<HTMLUListElement>, HTMLUListElement>
-export const ComboBoxMenu: React.FC<Menu & ULElement> = ({ children, isOpen = false, id, ...restProps }) => {
-  return (
-    <div className="relative">
-      <ul
-        {...restProps}
-        className={`Combobox-menu ${isOpen ? 'Combobox-menu__open' : ''}`}
-        id={id}
-      >
-        {isOpen ? children : null}
-      </ul>
-    </div>
-  );
-};
+export const ComboBoxMenu = forwardRef<HTMLUListElement, Menu & ULElement>
+  (({ children, isOpen = false, id, ...restProps }, ref) => {
+    return (
+      <div className="relative">
+        <ul
+          {...restProps}
+          className={`Combobox-menu ${isOpen ? 'Combobox-menu__open' : ''}`}
+          id={id}
+          ref={ref}
+        >
+          {isOpen ? children : null}
+        </ul>
+      </div>
+    );
+  });
 
 interface Item {
   onClick: any;
