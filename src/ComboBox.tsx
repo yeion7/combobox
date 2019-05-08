@@ -1,7 +1,4 @@
 import React, { LabelHTMLAttributes, forwardRef } from 'react';
-import ArrowIcon from './Components/ArrowIcon';
-import XIcon from './Components/XIcon';
-import { House } from './App';
 
 type DivElement = React.FC<React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>>
 export const ComboBox: DivElement = ({ children, ...restProps }) => (
@@ -23,11 +20,9 @@ export const ComboBoxLabel: React.FC<LabelHTMLAttributes<HTMLLabelElement>> =
 interface Input {
   value: string;
   onChange: React.ChangeEventHandler<HTMLInputElement>;
-  toggleMenu: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  clear: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  selectedItem: House | null;
   isOpen: boolean;
-  id: string
+  id: string,
+  buttonBox: React.ReactNode | null
 }
 
 type InputElement = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>
@@ -35,12 +30,10 @@ type InputElement = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputE
 export const ComboBoxInput = forwardRef<HTMLInputElement, Input & InputElement>(({
   value,
   onChange,
-  toggleMenu,
   isOpen,
-  selectedItem,
-  clear,
   id,
   onKeyDown,
+  buttonBox = null,
   ...restProps
 }, ref) => (
     <div className="relative">
@@ -54,14 +47,7 @@ export const ComboBoxInput = forwardRef<HTMLInputElement, Input & InputElement>(
         onChange={onChange}
         onKeyDown={onKeyDown}
       />
-      <button
-        className='Combobox-button'
-        onClick={(selectedItem && !isOpen) ? clear : toggleMenu}
-        aria-label={isOpen ? 'Cerrar Menu' : 'Abrir Menu'}
-        aria-haspopup="true"
-      >
-        {(isOpen || selectedItem) ? <XIcon /> : <ArrowIcon />}
-      </button>
+      {buttonBox}
     </div>
   ));
 

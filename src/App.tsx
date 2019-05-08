@@ -1,4 +1,4 @@
-import React, { useReducer, useMemo, useRef } from 'react';
+import React, { useReducer, useMemo, useRef, EventHandler, MouseEvent } from 'react';
 import matchSorter from 'match-sorter'
 import './App.css';
 
@@ -13,6 +13,8 @@ import {
 
 import DATA from './data.json'
 import { generateId, normalizeArrowKey } from './utils';
+import XIcon from './Components/XIcon';
+import ArrowIcon from './Components/ArrowIcon';
 
 export type House = typeof DATA[0];
 
@@ -97,6 +99,24 @@ const App: React.FC = () => {
   const labelId = `${id}-label`
   const inputId = `${id}-input`
   const getItemId = ((index: number) => `${id}-item-${index}`)
+  const focusInput = () => {
+    if (inputRef.current) {
+      inputRef.current.focus()
+    }
+  }
+
+  const clear = () => {
+    dispatch({ type: 'CLEAR' })
+    focusInput()
+  }
+
+  const toggleMenu: EventHandler<MouseEvent<HTMLButtonElement>> = (e) => {
+    e.preventDefault()
+    dispatch({ type: "TOGGLE_MENU" })
+    focusInput()
+  }
+
+  const isOpen = state.isOpen && optionsSorted.length > 0
 
   return (
     <section>
@@ -104,7 +124,7 @@ const App: React.FC = () => {
         role='combobox'
         aria-labelledby={labelId}
         aria-haspopup='listbox'
-        aria-expanded={state.isOpen}
+        aria-expanded={isOpen}
         aria-controls={inputId}
         aria-owns={menuId}
       >
@@ -154,22 +174,59 @@ const App: React.FC = () => {
                   : optionsSorted.length - 1
               })
             }
+
+            if (key === 'Escape') {
+              e.preventDefault()
+              dispatch({ type: "CLEAR" })
+            }
           }}
           onKeyUp={(e) => {
             e.preventDefault()
           }}
-          toggleMenu={(e) => {
-            e.preventDefault()
-            dispatch({ type: "TOGGLE_MENU" })
-          }}
-          isOpen={state.isOpen}
-          selectedItem={state.selectedItem}
-          clear={() => {
-            dispatch({ type: 'CLEAR' })
-            if (inputRef.current) {
-              inputRef.current.focus()
-            }
-          }}
+          isOpen={isOpen}
+          buttonBox={
+            <button
+              className='Combobox-button'
+              onClick={(state.selectedItem && !isOpen) ? clear : toggleMenu}
+              aria-label={isOpen ? 'Cerrar Menu' : 'Abrir Menu'}
+              aria-haspopup="true"
+              onKeyDown={(e) => {
+                const key = normalizeArrowKey(e)
+
+                if (key === 'Enter' && state.highlightedIndex !== null && isOpen) {
+                  e.preventDefault()
+                  dispatch({
+                    type: 'SELECT',
+                    payload: optionsSorted[state.highlightedIndex]
+                  })
+                }
+
+                if (key === 'ArrowDown') {
+                  e.preventDefault()
+                  dispatch({ type: "OPEN_MENU" })
+                  dispatch({
+                    type: 'HIGHLIGH',
+                    payload: state.highlightedIndex !== null
+                      ? (state.highlightedIndex + 1) % optionsSorted.length
+                      : 0
+                  })
+                }
+    
+                if (key === 'ArrowUp') {
+                  e.preventDefault()
+                  dispatch({ type: "OPEN_MENU" })
+                  dispatch({
+                    type: 'HIGHLIGH',
+                    payload: state.highlightedIndex !== null
+                      ? (state.highlightedIndex - 1 + optionsSorted.length) % optionsSorted.length
+                      : optionsSorted.length - 1
+                  })
+                }
+              }}
+            >
+              {(isOpen || state.selectedItem) ? <XIcon /> : <ArrowIcon />}
+            </button>
+          }
           aria-autocomplete="list"
           aria-controls={menuId}
           aria-multiline="false"
@@ -181,7 +238,7 @@ const App: React.FC = () => {
         />
         <ComboBoxMenu
           id={menuId}
-          isOpen={state.isOpen}
+          isOpen={isOpen}
           role="listbox"
           aria-labelledby={labelId}
         >
