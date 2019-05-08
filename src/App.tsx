@@ -1,4 +1,4 @@
-import React, { useReducer, useMemo } from 'react';
+import React, { useReducer, useMemo, useRef } from 'react';
 import matchSorter from 'match-sorter'
 import './App.css';
 
@@ -87,6 +87,7 @@ const options = DATA
 
 const App: React.FC = () => {
   const [state, dispatch] = useReducer(comboBoxReducer, initialState)
+  const inputRef = useRef<HTMLInputElement>(null)
   const optionsSorted = matchSorter(options, state.inputValue, {
     keys: ['name', 'words'],
   })
@@ -115,6 +116,7 @@ const App: React.FC = () => {
         </ComboBoxLabel>
         <ComboBoxInput
           id={inputId}
+          ref={inputRef}
           value={state.inputValue}
           onChange={(e) => {
             e.preventDefault()
@@ -125,7 +127,7 @@ const App: React.FC = () => {
 
             if (key === 'Enter' && state.highlightedIndex !== null) {
               e.preventDefault()
-              dispatch({ 
+              dispatch({
                 type: 'SELECT',
                 payload: optionsSorted[state.highlightedIndex]
               })
@@ -162,7 +164,12 @@ const App: React.FC = () => {
           }}
           isOpen={state.isOpen}
           selectedItem={state.selectedItem}
-          clear={() => dispatch({ type: 'CLEAR' })}
+          clear={() => {
+            dispatch({ type: 'CLEAR' })
+            if (inputRef.current) {
+              inputRef.current.focus()
+            }
+          }}
           aria-autocomplete="list"
           aria-controls={menuId}
           aria-multiline="false"
@@ -213,8 +220,8 @@ const App: React.FC = () => {
       </ComboBox>
       {
         state.selectedItem && (
-          <div style={{ textAlign: 'center' }}>
-            <h3>{state.selectedItem.name}</h3>
+          <section style={{ textAlign: 'center' }}>
+            <h3 >{state.selectedItem.name}</h3>
             <figure>
               <img
                 src={state.selectedItem.image || ''}
@@ -222,7 +229,7 @@ const App: React.FC = () => {
               />
               <figcaption>{state.selectedItem.words}</figcaption>
             </figure>
-          </div>
+          </section>
         )
       }
     </section>

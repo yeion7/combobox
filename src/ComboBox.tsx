@@ -1,4 +1,4 @@
-import React, { LabelHTMLAttributes } from 'react';
+import React, { LabelHTMLAttributes, forwardRef } from 'react';
 import ArrowIcon from './Components/ArrowIcon';
 import XIcon from './Components/XIcon';
 import { House } from './App';
@@ -32,7 +32,7 @@ interface Input {
 
 type InputElement = React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>
 
-export const ComboBoxInput: React.FC<Input & InputElement> = ({
+export const ComboBoxInput = forwardRef<HTMLInputElement, Input & InputElement>(({
   value,
   onChange,
   toggleMenu,
@@ -42,12 +42,13 @@ export const ComboBoxInput: React.FC<Input & InputElement> = ({
   id,
   onKeyDown,
   ...restProps
-}) => (
+}, ref) => (
     <div className="relative">
       <input
         {...restProps}
         id={id}
         type='text'
+        ref={ref}
         className={`Combobox-input ${isOpen ? "Combobox-input__open" : ''}`}
         value={value}
         onChange={onChange}
@@ -62,7 +63,7 @@ export const ComboBoxInput: React.FC<Input & InputElement> = ({
         {(isOpen || selectedItem) ? <XIcon /> : <ArrowIcon />}
       </button>
     </div>
-  );
+  ));
 
 interface Menu {
   isOpen?: boolean;
